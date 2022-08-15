@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sales">
+            <class>separator-top</class>
+            <label>Sales</label>
+            <tab>sales</tab>
+            <resource>Magento_Sales::config_sales</resource>
+            <group id="disallowed_countries" translate="label" type="text" sortOrder="200" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Disallowed Countries</label>
+                <comment>Choose whether a product is sealable by customer IP.</comment>
+                <field id='enabled' translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Module enabled</label>
+                    <comment>Choose whether a product could be sale for customer by customer IP.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id='api_key' translate="label comment" type="password" showInDefault="1">
+                    <label>API key for ipapi.com</label>
+                    <comment>Get a FREE API key at ipapi.com</comment>
+                </field>
+                <field id='scope' translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Product scope</label>
+                    <source_model>ML\DeveloperTest\Model\Source\ProductScope</source_model>
+                </field>
+                <field id='message' translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Message</label>
+                    <comment>Message to display for consumer. You can use variables like COUNTRY_NAME and COUNTRY_CODE</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
