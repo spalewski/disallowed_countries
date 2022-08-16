@@ -1,6 +1,5 @@
 {
     "name": "ml/module-developer-test",
-    "version": "1.0.0",
     "description": "N/A",
     "type": "magento2-module",
     "require": {
@@ -8,7 +7,7 @@
         "magento/module-checkout": "100.4.*"
     },
     "license": [
-        "Proprietary"
+        "MIT"
     ],
     "autoload": {
         "files": [
