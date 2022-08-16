@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="ML\DeveloperTest\Http\Request\BuilderInterface"
+                type="ML\DeveloperTest\Http\Request\Builder"/>
+    <preference for="ML\DeveloperTest\Http\ApiClientInterface"
+                type="ML\DeveloperTest\Http\ApiClient"/>
+    <preference for="ML\DeveloperTest\Api\GeolocalizatorInterface" type="ML\DeveloperTest\Service\Api\Geolocalizator"/>
+</config>

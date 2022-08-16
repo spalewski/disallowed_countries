@@ -33,6 +33,16 @@ class Config
     const XML_PATH_MESSAGE = 'sales/disallowed_countries/message';
 
     /**
+     * @var string
+     */
+    const XML_PATH_TIMEOUT = 'sales/disallowed_countries/timeout';
+
+    /**
+     * @var string
+     */
+    const XML_PATH_CONNECTION_TIMEOUT = 'sales/disallowed_countries/connection_timeout';
+
+    /**
      * @var ScopeConfigInterface
      */
     private ScopeConfigInterface $scopeConfig;
@@ -50,7 +60,7 @@ class Config
      */
     public function getApiKey()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_API_KEY, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
+        return $this->scopeConfig->getValue(self::XML_PATH_API_KEY);
     }
 
     /**
@@ -75,5 +85,21 @@ class Config
     public function getMessage()
     {
         return $this->scopeConfig->getValue(self::XML_PATH_MESSAGE, ScopeInterface::SCOPE_STORE);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTimeout()
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_TIMEOUT);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConnectionTimeout()
+    {
+        return $this->scopeConfig->getValue(self::XML_PATH_CONNECTION_TIMEOUT);
     }
 }

@@ -10,8 +10,9 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
+use ML\DeveloperTest\Api\GeolocalizatorInterface;
 use ML\DeveloperTest\Model\Config;
-use ML\DeveloperTest\Service\GeolocationService;
+use ML\DeveloperTest\Service\Api\Geolocalizator;
 use ML\DeveloperTest\Setup\Patch\Data\AddDisallowedCountriesProductAttribute;
 
 /**
@@ -20,7 +21,7 @@ use ML\DeveloperTest\Setup\Patch\Data\AddDisallowedCountriesProductAttribute;
 class QuotePlugin
 {
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Product
+     * @var Product
      */
     private Product $productResource;
 
@@ -30,31 +31,26 @@ class QuotePlugin
     private Configurable $configurable;
 
     /**
-     * @var GeolocationService
-     */
-    private GeolocationService $geolocationService;
-
-    /**
      * @var Config
      */
     private Config $config;
+    private Geolocalizator $geolocalizator;
 
     /**
      * @param Product $productResource
      * @param Configurable $configurable
-     * @param GeolocationService $geolocationService
      * @param Config $config
      */
     public function __construct(
         Product $productResource,
         Configurable $configurable,
-        GeolocationService $geolocationService,
-        Config $config
+        Config $config,
+        GeolocalizatorInterface $geolocalizator
     ) {
         $this->productResource = $productResource;
         $this->configurable = $configurable;
-        $this->geolocationService = $geolocationService;
         $this->config = $config;
+        $this->geolocalizator = $geolocalizator;
     }
 
     /**
@@ -75,7 +71,7 @@ class QuotePlugin
             return [$product, $request, $processMode];
         }
 
-        $geolocationData = $this->geolocationService->getClientGeolocationData();
+        $geolocationData = $this->geolocalizator->getClientGeolocationData();
 
         if (!$geolocationData) {
             return [$product, $request, $processMode];
@@ -83,14 +79,14 @@ class QuotePlugin
 
         $productToCheck = $this->getProduct($product, $request);
 
-        if ($this->isProductDisallowed($productToCheck, $geolocationData[GeolocationService::COUNTRY_CODE_KEY])) {
+        if ($this->isProductDisallowed($productToCheck, $geolocationData[Geolocalizator::COUNTRY_CODE_KEY])) {
             $message = str_replace([
-                strtoupper(GeolocationService::COUNTRY_CODE_KEY),
-                strtoupper(GeolocationService::COUNTRY_NAME_KEY)
+                strtoupper(Geolocalizator::COUNTRY_CODE_KEY),
+                strtoupper(Geolocalizator::COUNTRY_NAME_KEY)
             ],
                 [
-                    $geolocationData[GeolocationService::COUNTRY_CODE_KEY],
-                    $geolocationData[GeolocationService::COUNTRY_NAME_KEY]
+                    $geolocationData[Geolocalizator::COUNTRY_CODE_KEY],
+                    $geolocationData[Geolocalizator::COUNTRY_NAME_KEY]
                 ],
                 $this->config->getMessage());
 
@@ -123,7 +119,7 @@ class QuotePlugin
     }
 
     /**
-     * Check if product is sellable for specyfic country code
+     * Check if product is sellable for specific country code
      *
      * @param Product|null $product
      * @param string|null $countryCode

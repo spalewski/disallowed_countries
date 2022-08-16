@@ -11,7 +11,8 @@
                    showInWebsite="1" showInStore="1">
                 <label>Disallowed Countries</label>
                 <comment>Choose whether a product is sealable by customer IP.</comment>
-                <field id='enabled' translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id='enabled' translate="label comment" type="select" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
                     <label>Module enabled</label>
                     <comment>Choose whether a product could be sale for customer by customer IP.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -20,13 +21,24 @@
                     <label>API key for ipapi.com</label>
                     <comment>Get a FREE API key at ipapi.com</comment>
                 </field>
-                <field id='scope' translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id='scope' translate="label comment" type="select" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
                     <label>Product scope</label>
                     <source_model>ML\DeveloperTest\Model\Source\ProductScope</source_model>
                 </field>
-                <field id='message' translate="label comment" type="text" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id='message' translate="label comment" type="text" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
                     <label>Message</label>
-                    <comment>Message to display for consumer. You can use variables like COUNTRY_NAME and COUNTRY_CODE</comment>
+                    <comment>Message to display for consumer. You can use variables like COUNTRY_NAME and COUNTRY_CODE
+                    </comment>
+                </field>
+                <field id='timeout' translate="label comment" type="text" showInDefault="1" canRestore="1">
+                    <label>Timeout</label>
+                    <validate>validate-greater-than-zero</validate>
+                </field>
+                <field id='connect_timeout' translate="label comment" type="text" showInDefault="1" canRestore="1">
+                    <label>Connection Timeout</label>
+                    <validate>validate-greater-than-zero</validate>
                 </field>
             </group>
         </section>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sales>
+            <disallowed_countries>
+                <enabled>0</enabled>
+                <scope>simple</scope>
+                <message>I’m sorry, this product cannot be ordered from COUNTRY_NAME</message>
+                <timeout>5</timeout>
+                <connect_timeout>5</connect_timeout>
+            </disallowed_countries>
+        </sales>
+    </default>
+</config>
