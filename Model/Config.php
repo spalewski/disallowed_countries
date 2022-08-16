@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace ML\DeveloperTest\Model;
@@ -7,7 +8,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- *
+ * Config ML_DeveloperTest class
  */
 class Config
 {

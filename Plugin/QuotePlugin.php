@@ -1,24 +1,26 @@
 <?php
+
 declare(strict_types=1);
 
-namespace ML\DeveloperTest\Observer;
+namespace ML\DeveloperTest\Plugin;
 
-use Magento\Catalog\Model\ResourceModel\Product;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Model\Quote;
 use ML\DeveloperTest\Model\Config;
 use ML\DeveloperTest\Service\GeolocationService;
 use ML\DeveloperTest\Setup\Patch\Data\AddDisallowedCountriesProductAttribute;
 
 /**
- * AddToCartObserver class
+ * QuotePlugin class
  */
-class AddToCartObserver implements ObserverInterface
+class QuotePlugin
 {
     /**
-     * @var Product
+     * @var \Magento\Catalog\Model\ResourceModel\Product
      */
     private Product $productResource;
 
@@ -56,53 +58,63 @@ class AddToCartObserver implements ObserverInterface
     }
 
     /**
-     * Observer checks product added to cart if it's sellable for customer country
-     *
+     * @param Quote $subject
+     * @param Product|mixed $product
+     * @param float|DataObject|null $request
+     * @param string|null $processMode
+     * @return array
      * @throws LocalizedException
      */
-    public function execute(Observer $observer)
-    {
-        if ($this->config->isModuleEnabled()) {
-            $product = $this->getProduct($observer);
-            $geolocationData = $this->geolocationService->getClientGeolocationData();
-
-            if (!$geolocationData) {
-                return;
-            }
-
-            if ($this->isProductDisallowed($product, $geolocationData[GeolocationService::COUNTRY_CODE_KEY])) {
-                $message = str_replace([
-                    strtoupper(GeolocationService::COUNTRY_CODE_KEY),
-                    strtoupper(GeolocationService::COUNTRY_NAME_KEY)
-                ],
-                    [
-                        $geolocationData[GeolocationService::COUNTRY_CODE_KEY],
-                        $geolocationData[GeolocationService::COUNTRY_NAME_KEY]
-                    ],
-                    $this->config->getMessage());
-
-                throw new LocalizedException(__($message));
-            }
+    public function beforeAddProduct(
+        Quote $subject,
+        Product $product,
+        $request = null,
+        $processMode = AbstractType::PROCESS_MODE_FULL
+    ): array {
+        if (!$this->config->isModuleEnabled()) {
+            return [$product, $request, $processMode];
         }
+
+        $geolocationData = $this->geolocationService->getClientGeolocationData();
+
+        if (!$geolocationData) {
+            return [$product, $request, $processMode];
+        }
+
+        $productToCheck = $this->getProduct($product, $request);
+
+        if ($this->isProductDisallowed($productToCheck, $geolocationData[GeolocationService::COUNTRY_CODE_KEY])) {
+            $message = str_replace([
+                strtoupper(GeolocationService::COUNTRY_CODE_KEY),
+                strtoupper(GeolocationService::COUNTRY_NAME_KEY)
+            ],
+                [
+                    $geolocationData[GeolocationService::COUNTRY_CODE_KEY],
+                    $geolocationData[GeolocationService::COUNTRY_NAME_KEY]
+                ],
+                $this->config->getMessage());
+
+            throw new LocalizedException(__($message));
+        }
+
+        return [$product, $request, $processMode];
     }
 
     /**
      * Get configurable or simple product according to module settings
      *
-     * @param Observer $observer
-     * @return \Magento\Catalog\Model\Product|null
+     * @param Product $product
+     * @param $request
+     * @return Product|null
      */
-    public function getProduct(Observer $observer): ?\Magento\Catalog\Model\Product
+    public function getProduct(Product $product, $request): ?Product
     {
-        /**@var \Magento\Catalog\Model\Product $product */
-        $product = $observer->getData('product');
-        $request = $observer->getData('info');
-
-        if ($this->config->getProductScope() !== Configurable::TYPE_CODE) {
+        if ($this->config->getProductScope() === Configurable::TYPE_CODE) {
             return $product;
         }
 
         if ($product->getTypeId() === Configurable::TYPE_CODE) {
+            $request->getData();
             $attributes = $request['super_attribute'];
             $product = $this->configurable->getProductByAttributes($attributes, $product);
         }
@@ -113,11 +125,11 @@ class AddToCartObserver implements ObserverInterface
     /**
      * Check if product is sellable for specyfic country code
      *
-     * @param \Magento\Catalog\Model\Product|null $product
+     * @param Product|null $product
      * @param string|null $countryCode
      * @return bool|null
      */
-    private function isProductDisallowed(?\Magento\Catalog\Model\Product $product, ?string $countryCode): ?bool
+    private function isProductDisallowed(?Product $product, ?string $countryCode): ?bool
     {
         if (!$product || !$countryCode) {
             return null;
